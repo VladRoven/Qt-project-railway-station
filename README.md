@@ -1,2 +1,2 @@
 # QT project "Railway station"
-Project for course project in a university
+Project for a course project at the university
