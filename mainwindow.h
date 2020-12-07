@@ -1,7 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QFileDialog>
 #include <QMainWindow>
+#include <QStandardItemModel>
+#include <QJsonDocument>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -15,7 +18,14 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void on_open_file_triggered();
+
 private:
     Ui::MainWindow *ui;
+    QFileInfo file_info;
+    QStandardItemModel *model_trip = new QStandardItemModel;
+    QStandardItemModel *model_client = new QStandardItemModel;
+    QJsonDocument json_doc;
 };
 #endif // MAINWINDOW_H
