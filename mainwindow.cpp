@@ -20,9 +20,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_open_file_triggered()
 {
-    QString openFileName = QFileDialog::getOpenFileName(this, tr("Открыть файл"), QString(), tr("JSON (*.json)"));
     model_trip->clear();
     model_client->clear();
+    QString openFileName = QFileDialog::getOpenFileName(this, tr("Открыть файл"), QString(), tr("JSON (*.json)"));
     file_info = openFileName;
     QFile jsonFile(openFileName);
 
