@@ -58,27 +58,12 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Поиск по рейсу (откуда-куда): </string>
+                 <string>Поиск по рейсу: </string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QLineEdit" name="search_trip"/>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btn_search_trip">
-                <property name="font">
-                 <font>
-                  <pointsize>10</pointsize>
-                 </font>
-                </property>
-                <property name="cursor">
-                 <cursorShape>PointingHandCursor</cursorShape>
-                </property>
-                <property name="text">
-                 <string>Поиск</string>
-                </property>
-               </widget>
               </item>
              </layout>
             </item>
@@ -231,7 +216,7 @@
            <bool>false</bool>
           </attribute>
           <attribute name="verticalHeaderVisible">
-           <bool>true</bool>
+           <bool>false</bool>
           </attribute>
          </widget>
         </item>
@@ -386,21 +371,6 @@
            <widget class="QLineEdit" name="search_client"/>
           </item>
           <item>
-           <widget class="QPushButton" name="btn_search_client">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="cursor">
-             <cursorShape>PointingHandCursor</cursorShape>
-            </property>
-            <property name="text">
-             <string>Найти</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <spacer name="horizontalSpacer_5">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -443,6 +413,9 @@
           </property>
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAsNeeded</enum>
+          </property>
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
           </property>
           <property name="selectionMode">
            <enum>QAbstractItemView::SingleSelection</enum>

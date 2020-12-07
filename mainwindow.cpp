@@ -6,6 +6,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QMap>
+#include <QSortFilterProxyModel>
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -20,8 +21,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_open_file_triggered()
 {
-    model_trip->clear();
-    model_client->clear();
     QString openFileName = QFileDialog::getOpenFileName(this, tr("Открыть файл"), QString(), tr("JSON (*.json)"));
     file_info = openFileName;
     QFile jsonFile(openFileName);
@@ -31,6 +30,8 @@ void MainWindow::on_open_file_triggered()
         return;
     }
 
+    model_trip->clear();
+    model_client->clear();
     QByteArray saveData = jsonFile.readAll();
     json_doc = QJsonDocument::fromJson(saveData);
     QStringList horizontalHeader;
@@ -73,16 +74,62 @@ void MainWindow::on_open_file_triggered()
                         temp_list_client.append(new QStandardItem(var_sec.toString()));
                     }
                     temp_list_client.append(new QStandardItem(current_trip));
-                    model_client->insertRow(j, temp_list_client);
+                    client_list.append(temp_list_client);
+                    model_client->appendRow(temp_list_client);
                 }
             }
             else
                 temp_list.append(new QStandardItem(var.toString()));
         }
         temp_list.append(new QStandardItem(QString::number(current_count_client)));
+        trip_list.append(temp_list);
         current_count_client = 0;
         model_trip->insertRow(i, temp_list);
     }
     ui->table_trip->setModel(model_trip);
     ui->table_client->setModel(model_client);
+}
+
+void MainWindow::on_btn_search_client_clicked()
+{
+    QString search = ui->search_client->text();
+    if (search.length())
+    {
+        QSortFilterProxyModel *proxy_model = new QSortFilterProxyModel();
+        proxy_model->setSourceModel(model_client);
+        ui->table_client->setModel(proxy_model);
+        proxy_model->setFilterRegExp(search);
+    }
+    else
+        ui->table_client->setModel(model_client);
+}
+
+void MainWindow::on_search_client_textChanged(const QString &arg1)
+{
+    if (arg1.length())
+    {
+        QString str = arg1;
+        str[ 0 ] = str[ 0 ].toUpper();
+        QSortFilterProxyModel *proxy_model = new QSortFilterProxyModel();
+        proxy_model->setSourceModel(model_client);
+        ui->table_client->setModel(proxy_model);
+        proxy_model->setFilterRegExp(str);
+    }
+    else
+        ui->table_client->setModel(model_client);
+}
+
+void MainWindow::on_search_trip_textChanged(const QString &arg1)
+{
+    if (arg1.length())
+    {
+        QString str = arg1;
+        str[ 0 ] = str[ 0 ].toUpper();
+        QSortFilterProxyModel *proxy_model = new QSortFilterProxyModel();
+        proxy_model->setSourceModel(model_trip);
+        ui->table_trip->setModel(proxy_model);
+        proxy_model->setFilterRegExp(str);
+    }
+    else
+        ui->table_trip->setModel(model_trip);
 }
