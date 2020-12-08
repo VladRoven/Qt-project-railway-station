@@ -74,7 +74,6 @@ void MainWindow::on_open_file_triggered()
                         temp_list_client.append(new QStandardItem(var_sec.toString()));
                     }
                     temp_list_client.append(new QStandardItem(current_trip));
-                    client_list.append(temp_list_client);
                     model_client->appendRow(temp_list_client);
                 }
             }
@@ -82,26 +81,11 @@ void MainWindow::on_open_file_triggered()
                 temp_list.append(new QStandardItem(var.toString()));
         }
         temp_list.append(new QStandardItem(QString::number(current_count_client)));
-        trip_list.append(temp_list);
         current_count_client = 0;
         model_trip->insertRow(i, temp_list);
     }
     ui->table_trip->setModel(model_trip);
     ui->table_client->setModel(model_client);
-}
-
-void MainWindow::on_btn_search_client_clicked()
-{
-    QString search = ui->search_client->text();
-    if (search.length())
-    {
-        QSortFilterProxyModel *proxy_model = new QSortFilterProxyModel();
-        proxy_model->setSourceModel(model_client);
-        ui->table_client->setModel(proxy_model);
-        proxy_model->setFilterRegExp(search);
-    }
-    else
-        ui->table_client->setModel(model_client);
 }
 
 void MainWindow::on_search_client_textChanged(const QString &arg1)
@@ -132,4 +116,22 @@ void MainWindow::on_search_trip_textChanged(const QString &arg1)
     }
     else
         ui->table_trip->setModel(model_trip);
+}
+
+void MainWindow::on_btn_set_filter_clicked()
+{
+    if (ui->date_from->date() <= ui->date_to->date())
+    {
+        QSortFilterProxyModel *proxy_model = new QSortFilterProxyModel();
+        proxy_model->setSourceModel(model_trip);
+        ui->table_trip->setModel(proxy_model);
+        ui->table_trip->sortByColumn(1, Qt::AscendingOrder);
+        proxy_model->setFilterKeyColumn(1);
+        proxy_model->setFilterRegExp("(0[" + QString::number(ui->date_from->date().day()) + "-" + QString::number(ui->date_to->date().day()) + "]|[" + QString::number(ui->date_from->date().day()) + "-" + QString::number(ui->date_to->date().day()) + "]{1,2}).(0[" + QString::number(ui->date_from->date().month()) + "-" + QString::number(ui->date_to->date().month()) + "]|[" + QString::number(ui->date_from->date().month()) + "-" + QString::number(ui->date_to->date().month()) + "]{1,2}).([" + QString::number(ui->date_from->date().year()) + "-" + QString::number(ui->date_to->date().year()) + "])");
+    }
+}
+
+void MainWindow::on_btn_drop_filter_clicked()
+{
+    ui->table_trip->setModel(model_trip);
 }

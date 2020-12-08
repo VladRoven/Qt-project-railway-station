@@ -21,11 +21,13 @@ public:
 private slots:
     void on_open_file_triggered();
 
-    void on_btn_search_client_clicked();
-
     void on_search_client_textChanged(const QString &arg1);
 
     void on_search_trip_textChanged(const QString &arg1);
+
+    void on_btn_set_filter_clicked();
+
+    void on_btn_drop_filter_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -33,7 +35,5 @@ private:
     QStandardItemModel *model_trip = new QStandardItemModel;
     QStandardItemModel *model_client = new QStandardItemModel;
     QJsonDocument json_doc;
-    QList<QStandardItem *> client_list;
-    QList<QStandardItem *> trip_list;
 };
 #endif // MAINWINDOW_H

@@ -98,7 +98,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Фильтрация по дате и времени</string>
+               <string>Фильтрация по дате отправления</string>
               </property>
              </widget>
             </item>
@@ -123,11 +123,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QDateTimeEdit" name="date_from">
-                <property name="cursor">
-                 <cursorShape>PointingHandCursor</cursorShape>
-                </property>
-               </widget>
+               <widget class="QDateEdit" name="date_from"/>
               </item>
              </layout>
             </item>
@@ -155,28 +151,37 @@
                </widget>
               </item>
               <item>
-               <widget class="QDateTimeEdit" name="date_to">
-                <property name="cursor">
-                 <cursorShape>PointingHandCursor</cursorShape>
-                </property>
-               </widget>
+               <widget class="QDateEdit" name="date_to"/>
               </item>
              </layout>
             </item>
             <item>
-             <widget class="QPushButton" name="btn_set_filter">
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="cursor">
-               <cursorShape>PointingHandCursor</cursorShape>
-              </property>
-              <property name="text">
-               <string>Применить</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <widget class="QPushButton" name="btn_set_filter">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Применить</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btn_drop_filter">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Отменить</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
           </item>
