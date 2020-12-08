@@ -86,52 +86,157 @@ void MainWindow::on_open_file_triggered()
     }
     ui->table_trip->setModel(model_trip);
     ui->table_client->setModel(model_client);
+    ui->status_line->showMessage("Открыт файл: " + file_info.baseName() + " (" + file_info.absoluteFilePath() + ")");
 }
 
 void MainWindow::on_search_client_textChanged(const QString &arg1)
 {
-    if (arg1.length())
+    if (!json_doc.isEmpty())
     {
-        QString str = arg1;
-        str[ 0 ] = str[ 0 ].toUpper();
-        QSortFilterProxyModel *proxy_model = new QSortFilterProxyModel();
-        proxy_model->setSourceModel(model_client);
-        ui->table_client->setModel(proxy_model);
-        proxy_model->setFilterRegExp(str);
+        if (arg1.length())
+        {
+            QString str = arg1;
+            str[ 0 ] = str[ 0 ].toUpper();
+            for (int i = 1; i < str.length(); i++)
+            {
+                str[i] = str[i].toLower();
+            }
+            QSortFilterProxyModel *proxy_model = new QSortFilterProxyModel();
+            proxy_model->setSourceModel(model_client);
+            ui->table_client->setModel(proxy_model);
+            proxy_model->setFilterRegExp(str);
+            ui->status_line->showMessage("Найдено записей: " + QString::number(proxy_model->rowCount()));
+        }
+        else
+        {
+            ui->table_client->setModel(model_client);
+            ui->status_line->showMessage("Всего записей: " + QString::number(model_client->rowCount()));
+        }
     }
-    else
-        ui->table_client->setModel(model_client);
 }
 
 void MainWindow::on_search_trip_textChanged(const QString &arg1)
 {
-    if (arg1.length())
+    if (!json_doc.isEmpty())
     {
-        QString str = arg1;
-        str[ 0 ] = str[ 0 ].toUpper();
-        QSortFilterProxyModel *proxy_model = new QSortFilterProxyModel();
-        proxy_model->setSourceModel(model_trip);
-        ui->table_trip->setModel(proxy_model);
-        proxy_model->setFilterRegExp(str);
+        if (arg1.length())
+        {
+            QString str = arg1;
+            str[ 0 ] = str[ 0 ].toUpper();
+            for (int i = 1; i < str.length(); i++)
+            {
+                if (str[i - 1] == '-')
+                    str[i] = str[i].toUpper();
+                else
+                    str[i] = str[i].toLower();
+            }
+            QSortFilterProxyModel *proxy_model = new QSortFilterProxyModel();
+            proxy_model->setSourceModel(model_trip);
+            ui->table_trip->setModel(proxy_model);
+            proxy_model->setFilterRegExp(str);
+            ui->status_line->showMessage("Найдено записей: " + QString::number(proxy_model->rowCount()));
+        }
+        else
+        {
+            ui->table_trip->setModel(model_trip);
+            ui->status_line->showMessage("Всего записей: " + QString::number(model_trip->rowCount()));
+        }
     }
-    else
-        ui->table_trip->setModel(model_trip);
 }
 
 void MainWindow::on_btn_set_filter_clicked()
 {
-    if (ui->date_from->date() <= ui->date_to->date())
+    if (!json_doc.isEmpty())
     {
-        QSortFilterProxyModel *proxy_model = new QSortFilterProxyModel();
-        proxy_model->setSourceModel(model_trip);
-        ui->table_trip->setModel(proxy_model);
-        ui->table_trip->sortByColumn(1, Qt::AscendingOrder);
-        proxy_model->setFilterKeyColumn(1);
-        proxy_model->setFilterRegExp("(0[" + QString::number(ui->date_from->date().day()) + "-" + QString::number(ui->date_to->date().day()) + "]|[" + QString::number(ui->date_from->date().day()) + "-" + QString::number(ui->date_to->date().day()) + "]{1,2}).(0[" + QString::number(ui->date_from->date().month()) + "-" + QString::number(ui->date_to->date().month()) + "]|[" + QString::number(ui->date_from->date().month()) + "-" + QString::number(ui->date_to->date().month()) + "]{1,2}).([" + QString::number(ui->date_from->date().year()) + "-" + QString::number(ui->date_to->date().year()) + "])");
+        if (ui->date_from->date() <= ui->date_to->date())
+        {
+            QSortFilterProxyModel *proxy_model = new QSortFilterProxyModel();
+            proxy_model->setSourceModel(model_trip);
+            ui->table_trip->setModel(proxy_model);
+            ui->table_trip->sortByColumn(1, Qt::AscendingOrder);
+            proxy_model->setFilterKeyColumn(1);
+            proxy_model->setFilterRegExp("(0[" + QString::number(ui->date_from->date().day()) + "-" + QString::number(ui->date_to->date().day()) + "]|[" + QString::number(ui->date_from->date().day()) + "-" + QString::number(ui->date_to->date().day()) + "]{1,2}).(0[" + QString::number(ui->date_from->date().month()) + "-" + QString::number(ui->date_to->date().month()) + "]|[" + QString::number(ui->date_from->date().month()) + "-" + QString::number(ui->date_to->date().month()) + "]{1,2}).([" + QString::number(ui->date_from->date().year()) + "-" + QString::number(ui->date_to->date().year()) + "])");
+            ui->status_line->showMessage("Найдено записей: " + QString::number(proxy_model->rowCount()));
+        }
     }
 }
 
 void MainWindow::on_btn_drop_filter_clicked()
 {
-    ui->table_trip->setModel(model_trip);
+    if (!json_doc.isEmpty())
+    {
+        ui->table_trip->setModel(model_trip);
+        ui->status_line->showMessage("Всего записей: " + QString::number(model_trip->rowCount()));
+    }
+}
+
+void MainWindow::on_save_file_triggered()
+{
+    if (!json_doc.isEmpty())
+    {
+        QFile json_file(file_info.absoluteFilePath());
+        QDir::setCurrent(file_info.path());
+
+        if (!json_file.open(QIODevice::WriteOnly))
+        {
+            return;
+        }
+
+        json_file.write(json_doc.toJson(QJsonDocument::Indented));
+        json_file.close();
+        ui->status_line->showMessage("Файл \"" + file_info.baseName() + "\" сохранён! Путь: " + file_info.absoluteFilePath());
+    }
+    else
+        ui->status_line->showMessage("Файл не открыт!");
+}
+
+void MainWindow::on_action_2_triggered()
+{
+    if (!json_doc.isEmpty())
+    {
+        QString saveFileName = QFileDialog::getSaveFileName(this,
+                                                                tr("Сохранить файл как"),
+                                                                QString(),
+                                                                tr("JSON (*.json)"));
+        QFileInfo fileInfo(saveFileName);
+        QDir::setCurrent(fileInfo.path());
+        QFile json_file(saveFileName);
+
+        if (!json_file.open(QIODevice::WriteOnly))
+        {
+            return;
+        }
+
+        json_file.write(json_doc.toJson(QJsonDocument::Indented));
+        json_file.close();
+        ui->status_line->showMessage("Файл \"" + fileInfo.baseName() + "\" сохранён! Путь: " + fileInfo.absoluteFilePath());
+    }
+    else
+        ui->status_line->showMessage("Файл не открыт!");
+}
+
+void MainWindow::on_search_ticket_textChanged(const QString &arg1)
+{
+    if (!json_doc.isEmpty())
+    {
+        if (arg1.length())
+        {
+            QString str = arg1;
+            for (int i = 0; i < str.length(); i++)
+            {
+                str[i] = str[i].toUpper();
+            }
+            QSortFilterProxyModel *proxy_model = new QSortFilterProxyModel();
+            proxy_model->setSourceModel(model_client);
+            ui->table_client->setModel(proxy_model);
+            proxy_model->setFilterKeyColumn(2);
+            proxy_model->setFilterRegExp(str);
+            ui->status_line->showMessage("Найдено записей: " + QString::number(proxy_model->rowCount()));
+        }
+        else
+        {
+            ui->table_client->setModel(model_client);
+            ui->status_line->showMessage("Всего записей: " + QString::number(model_client->rowCount()));
+        }
+    }
 }

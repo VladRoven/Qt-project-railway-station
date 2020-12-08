@@ -29,6 +29,12 @@ private slots:
 
     void on_btn_drop_filter_clicked();
 
+    void on_save_file_triggered();
+
+    void on_action_2_triggered();
+
+    void on_search_ticket_textChanged(const QString &arg1);
+
 private:
     Ui::MainWindow *ui;
     QFileInfo file_info;
