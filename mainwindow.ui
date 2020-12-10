@@ -546,7 +546,7 @@
     </property>
     <addaction name="open_file"/>
     <addaction name="save_file"/>
-    <addaction name="action_2"/>
+    <addaction name="save_file_as"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -579,7 +579,7 @@
     <string>Клиентов по рейсу</string>
    </property>
   </action>
-  <action name="action_2">
+  <action name="save_file_as">
    <property name="text">
     <string>Сохранить файл как</string>
    </property>

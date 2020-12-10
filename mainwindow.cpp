@@ -33,7 +33,7 @@ void MainWindow::on_open_file_triggered()
     model_trip->clear();
     model_client->clear();
     QByteArray saveData = jsonFile.readAll();
-    json_doc = QJsonDocument::fromJson(saveData);
+    QJsonDocument json_doc = QJsonDocument::fromJson(saveData);
     QStringList horizontalHeader;
     horizontalHeader.append({"Рейс", "Отправление", "Прибытие", "Кол-во вагонов", "Остановок", "Билетов всего", "Билетов продано"});
 
@@ -46,52 +46,41 @@ void MainWindow::on_open_file_triggered()
     ui->table_trip->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->table_client->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-    QJsonArray temp_array = json_doc.array();
-    QMap<QString, QVariant> temp_map;
-    QMap<QString, QVariant> temp_client_map;
-    QList<QStandardItem *> temp_list;
-    QList<QStandardItem *> temp_list_client;
-    QString current_trip;
-    int current_count_client;
+    QJsonArray json_trip = json_doc.object()["trip"].toArray();
+    QJsonArray json_client = json_doc.object()["client"].toArray();
 
-    for (int i = 0; i < json_doc.array().count(); i++)
+    QJsonArray temp_array;
+    QList<QStandardItem *> temp_list;
+
+    for (int i = 0; i < json_trip.count(); i++)
     {
-        temp_map = temp_array[i].toVariant().toMap();
         temp_list.clear();
-        for (QVariant var : temp_map)
+        temp_array = json_trip[i].toArray();
+        for (int j = 0; j < temp_array.count(); j++)
         {
-            if (var.toString().contains('-'))
-                current_trip = var.toString();
-            if (var.toJsonArray().size())
-            {
-                current_count_client = var.toJsonArray().size();
-                for (int j = 0; j < var.toJsonArray().size(); j++)
-                {
-                    temp_list_client.clear();
-                    temp_client_map = var.toJsonArray()[j].toVariant().toMap();
-                    for (QVariant var_sec : temp_client_map)
-                    {
-                        temp_list_client.append(new QStandardItem(var_sec.toString()));
-                    }
-                    temp_list_client.append(new QStandardItem(current_trip));
-                    model_client->appendRow(temp_list_client);
-                }
-            }
-            else
-                temp_list.append(new QStandardItem(var.toString()));
+           temp_list.append(new QStandardItem(temp_array[j].toString()));
         }
-        temp_list.append(new QStandardItem(QString::number(current_count_client)));
-        current_count_client = 0;
         model_trip->insertRow(i, temp_list);
     }
-    ui->table_trip->setModel(model_trip);
+
+    for (int i = 0; i < json_client.count(); i++)
+    {
+        temp_list.clear();
+        temp_array = json_client[i].toArray();
+        for (int j = 0; j < temp_array.count(); j++)
+        {
+           temp_list.append(new QStandardItem(temp_array[j].toString()));
+        }
+        model_client->insertRow(i, temp_list);
+    }
     ui->table_client->setModel(model_client);
+    ui->table_trip->setModel(model_trip);
     ui->status_line->showMessage("Открыт файл: " + file_info.baseName() + " (" + file_info.absoluteFilePath() + ")");
 }
 
 void MainWindow::on_search_client_textChanged(const QString &arg1)
 {
-    if (!json_doc.isEmpty())
+    if (file_info.absoluteFilePath() != "")
     {
         if (arg1.length())
         {
@@ -117,7 +106,7 @@ void MainWindow::on_search_client_textChanged(const QString &arg1)
 
 void MainWindow::on_search_trip_textChanged(const QString &arg1)
 {
-    if (!json_doc.isEmpty())
+    if (file_info.absoluteFilePath() != "")
     {
         if (arg1.length())
         {
@@ -146,7 +135,7 @@ void MainWindow::on_search_trip_textChanged(const QString &arg1)
 
 void MainWindow::on_btn_set_filter_clicked()
 {
-    if (!json_doc.isEmpty())
+    if (file_info.absoluteFilePath() != "")
     {
         if (ui->date_from->date() <= ui->date_to->date())
         {
@@ -163,7 +152,7 @@ void MainWindow::on_btn_set_filter_clicked()
 
 void MainWindow::on_btn_drop_filter_clicked()
 {
-    if (!json_doc.isEmpty())
+    if (file_info.absoluteFilePath() != "")
     {
         ui->table_trip->setModel(model_trip);
         ui->status_line->showMessage("Всего записей: " + QString::number(model_trip->rowCount()));
@@ -172,7 +161,7 @@ void MainWindow::on_btn_drop_filter_clicked()
 
 void MainWindow::on_save_file_triggered()
 {
-    if (!json_doc.isEmpty())
+    if (file_info.absoluteFilePath() != "")
     {
         QFile json_file(file_info.absoluteFilePath());
         QDir::setCurrent(file_info.path());
@@ -182,7 +171,36 @@ void MainWindow::on_save_file_triggered()
             return;
         }
 
-        json_file.write(json_doc.toJson(QJsonDocument::Indented));
+        QJsonObject json;
+        QJsonArray data;
+        for (int i = 0; i < model_trip->rowCount(); i++)
+        {
+            QJsonArray row;
+
+            for (int j = 0; j < model_trip->columnCount(); j++)
+            {
+                row.append(QJsonValue(model_trip->item(i, j)->text()));
+            }
+            data.append(row);
+        }
+
+        json["trip"] = data;
+        data = {};
+
+        for (int i = 0; i < model_client->rowCount(); i++)
+        {
+            QJsonArray row;
+
+            for (int j = 0; j < model_client->columnCount(); j++)
+            {
+                row.append(QJsonValue(model_client->item(i, j)->text()));
+            }
+            data.append(row);
+        }
+        json["client"] = data;
+
+        QJsonDocument saveDoc(json);
+        json_file.write(saveDoc.toJson());
         json_file.close();
         ui->status_line->showMessage("Файл \"" + file_info.baseName() + "\" сохранён! Путь: " + file_info.absoluteFilePath());
     }
@@ -190,9 +208,9 @@ void MainWindow::on_save_file_triggered()
         ui->status_line->showMessage("Файл не открыт!");
 }
 
-void MainWindow::on_action_2_triggered()
+void MainWindow::on_save_file_as_triggered()
 {
-    if (!json_doc.isEmpty())
+    if (file_info.absoluteFilePath() != "")
     {
         QString saveFileName = QFileDialog::getSaveFileName(this,
                                                                 tr("Сохранить файл как"),
@@ -207,7 +225,37 @@ void MainWindow::on_action_2_triggered()
             return;
         }
 
-        json_file.write(json_doc.toJson(QJsonDocument::Indented));
+        QJsonObject json;
+        QJsonArray data;
+        for (int i = 0; i < model_trip->rowCount(); i++)
+        {
+            QJsonArray row;
+
+            for (int j = 0; j < model_trip->columnCount(); j++)
+            {
+                row.append(QJsonValue(model_trip->item(i, j)->text()));
+            }
+            data.append(row);
+        }
+
+        json["trip"] = data;
+        data = {};
+
+        for (int i = 0; i < model_client->rowCount(); i++)
+        {
+            QJsonArray row;
+
+            for (int j = 0; j < model_client->columnCount(); j++)
+            {
+                row.append(QJsonValue(model_client->item(i, j)->text()));
+            }
+            data.append(row);
+        }
+        json["client"] = data;
+
+        QJsonDocument saveDoc(json);
+//        json_file.write(json_doc.toJson(QJsonDocument::Indented));
+        json_file.write(saveDoc.toJson());
         json_file.close();
         ui->status_line->showMessage("Файл \"" + fileInfo.baseName() + "\" сохранён! Путь: " + fileInfo.absoluteFilePath());
     }
@@ -217,7 +265,7 @@ void MainWindow::on_action_2_triggered()
 
 void MainWindow::on_search_ticket_textChanged(const QString &arg1)
 {
-    if (!json_doc.isEmpty())
+    if (file_info.absoluteFilePath() != "")
     {
         if (arg1.length())
         {

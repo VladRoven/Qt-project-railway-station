@@ -31,7 +31,7 @@ private slots:
 
     void on_save_file_triggered();
 
-    void on_action_2_triggered();
+    void on_save_file_as_triggered();
 
     void on_search_ticket_textChanged(const QString &arg1);
 
@@ -40,6 +40,5 @@ private:
     QFileInfo file_info;
     QStandardItemModel *model_trip = new QStandardItemModel;
     QStandardItemModel *model_client = new QStandardItemModel;
-    QJsonDocument json_doc;
 };
 #endif // MAINWINDOW_H
