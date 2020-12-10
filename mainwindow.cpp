@@ -11,6 +11,8 @@
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    edit_trip = new TripEditForm(this);
+    edit_trip->setModel(model_trip);
 }
 
 MainWindow::~MainWindow()
@@ -287,4 +289,10 @@ void MainWindow::on_search_ticket_textChanged(const QString &arg1)
             ui->status_line->showMessage("Всего записей: " + QString::number(model_client->rowCount()));
         }
     }
+}
+
+void MainWindow::on_table_trip_doubleClicked(const QModelIndex &index)
+{
+    edit_trip->mapper->setCurrentModelIndex(index);
+    edit_trip->show();
 }

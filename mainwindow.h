@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <QJsonDocument>
+#include "tripeditform.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -35,10 +36,13 @@ private slots:
 
     void on_search_ticket_textChanged(const QString &arg1);
 
+    void on_table_trip_doubleClicked(const QModelIndex &index);
+
 private:
     Ui::MainWindow *ui;
     QFileInfo file_info;
     QStandardItemModel *model_trip = new QStandardItemModel;
     QStandardItemModel *model_client = new QStandardItemModel;
+    TripEditForm *edit_trip;
 };
 #endif // MAINWINDOW_H
