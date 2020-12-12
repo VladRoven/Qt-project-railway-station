@@ -7,12 +7,16 @@
 #include <QJsonDocument>
 #include <QMap>
 #include <QSortFilterProxyModel>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     edit_trip = new TripEditForm(this);
     edit_trip->setModel(model_trip);
+
+    edit_client = new ClientEditForm(this);
+    edit_client->setModel(model_client);
 }
 
 MainWindow::~MainWindow()
@@ -293,6 +297,86 @@ void MainWindow::on_search_ticket_textChanged(const QString &arg1)
 
 void MainWindow::on_table_trip_doubleClicked(const QModelIndex &index)
 {
+    edit_trip->setModel(ui->table_trip->model());
     edit_trip->mapper->setCurrentModelIndex(index);
     edit_trip->show();
+}
+
+void MainWindow::on_table_client_doubleClicked(const QModelIndex &index)
+{
+    QStringList list;
+
+    for (int i = 0; i < model_trip->rowCount(); i++)
+    {
+        list.append(QString(model_trip->item(i)->text()));
+    }
+
+    edit_client->setComboBox(list);
+    edit_client->setModel(ui->table_client->model());
+    edit_client->mapper->setCurrentModelIndex(index);
+    edit_client->show();
+}
+
+void MainWindow::on_btn_del_trip_clicked()
+{
+    QModelIndex index = ui->table_trip->currentIndex();
+    auto model = ui->table_trip->model();
+
+    if (index.row() >= 0)
+    {
+        QMessageBox *msg = new QMessageBox();
+        msg->setIcon(QMessageBox::Information);
+        msg->setWindowTitle("Подтверждение удаления");
+        msg->setText("Вы действительно хотите удалить выбранный рейс?");
+        msg->setInformativeText("При удалении рейса будет удалена иформация о билетах, зареплённая за ним!");
+        QPushButton *btn_ok = msg->addButton("Да", QMessageBox::AcceptRole);
+        msg->addButton("Отмена", QMessageBox::RejectRole);
+        msg->exec();
+
+        if (msg->clickedButton() == btn_ok)
+        {
+            for (int i = model_client->rowCount() - 1; i >= 0; i--)
+            {
+                if (model_client->item(i, 3)->text().contains(model->data(model->index(index.row(), 0)).toString()))
+                {
+                    model_client->removeRow(i);
+                }
+            }
+
+            model->removeRow(index.row());
+            ui->table_trip->setModel(model_trip);
+            ui->table_client->setModel(model_client);
+        }
+    }
+    else
+    {
+        ui->status_line->showMessage("Выберите рейс!");
+    }
+}
+
+void MainWindow::on_btn_del_client_clicked()
+{
+    QModelIndex index = ui->table_client->currentIndex();
+    auto model = ui->table_trip->model();
+
+    if (index.row() >= 0)
+    {
+        QMessageBox *msg = new QMessageBox();
+        msg->setIcon(QMessageBox::Information);
+        msg->setWindowTitle("Подтверждение удаления");
+        msg->setText("Вы действительно хотите удалить выбранного клиента?");
+        QPushButton *btn_ok = msg->addButton("Да", QMessageBox::AcceptRole);
+        msg->addButton("Отмена", QMessageBox::RejectRole);
+        msg->exec();
+
+        if (msg->clickedButton() == btn_ok)
+        {
+            model->removeRow(index.row());
+            ui->table_client->setModel(model_client);
+        }
+    }
+    else
+    {
+        ui->status_line->showMessage("Выберите клиента!");
+    }
 }
