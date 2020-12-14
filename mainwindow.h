@@ -7,6 +7,7 @@
 #include <QJsonDocument>
 #include "tripeditform.h"
 #include "clienteditform.h"
+#include "tripaddform.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -45,6 +46,8 @@ private slots:
 
     void on_btn_del_client_clicked();
 
+    void on_btn_add_trip_clicked();
+
 private:
     Ui::MainWindow *ui;
     QFileInfo file_info;
@@ -52,5 +55,6 @@ private:
     QStandardItemModel *model_client = new QStandardItemModel;
     TripEditForm *edit_trip;
     ClientEditForm *edit_client;
+    TripAddForm *add_trip;
 };
 #endif // MAINWINDOW_H

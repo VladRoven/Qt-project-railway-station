@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TripEditForm</class>
- <widget class="QMainWindow" name="TripEditForm">
+ <class>TripAddForm</class>
+ <widget class="QMainWindow" name="TripAddForm">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>362</width>
-    <height>318</height>
+    <width>408</width>
+    <height>371</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Изменить данные</string>
+   <string>Новый рейс</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -39,7 +39,18 @@
        </widget>
       </item>
       <item>
-       <widget class="QDateTimeEdit" name="date_from"/>
+       <widget class="QDateTimeEdit" name="date_from">
+        <property name="dateTime">
+         <datetime>
+          <hour>0</hour>
+          <minute>0</minute>
+          <second>0</second>
+          <year>2020</year>
+          <month>1</month>
+          <day>1</day>
+         </datetime>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -53,7 +64,18 @@
        </widget>
       </item>
       <item>
-       <widget class="QDateTimeEdit" name="date_to"/>
+       <widget class="QDateTimeEdit" name="date_to">
+        <property name="dateTime">
+         <datetime>
+          <hour>0</hour>
+          <minute>0</minute>
+          <second>0</second>
+          <year>2020</year>
+          <month>1</month>
+          <day>1</day>
+         </datetime>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -67,7 +89,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="count_wagons"/>
+       <widget class="QSpinBox" name="count_wagons">
+        <property name="maximum">
+         <number>30</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -81,7 +107,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="count_stop"/>
+       <widget class="QSpinBox" name="count_stop">
+        <property name="maximum">
+         <number>20</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -95,7 +125,29 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="count_tickets"/>
+       <widget class="QSpinBox" name="count_tickets">
+        <property name="maximum">
+         <number>1620</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_8">
+      <item>
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Билетов продано: </string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="count_tickets_sale">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>

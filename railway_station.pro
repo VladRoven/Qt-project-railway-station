@@ -12,16 +12,19 @@ SOURCES += \
     clienteditform.cpp \
     main.cpp \
     mainwindow.cpp \
+    tripaddform.cpp \
     tripeditform.cpp
 
 HEADERS += \
     clienteditform.h \
     mainwindow.h \
+    tripaddform.h \
     tripeditform.h
 
 FORMS += \
     clienteditform.ui \
     mainwindow.ui \
+    tripaddform.ui \
     tripeditform.ui
 
 # Default rules for deployment.

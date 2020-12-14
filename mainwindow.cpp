@@ -8,6 +8,8 @@
 #include <QMap>
 #include <QSortFilterProxyModel>
 #include <QMessageBox>
+#include <QDateTime>
+#include <QDateTime>
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -17,6 +19,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     edit_client = new ClientEditForm(this);
     edit_client->setModel(model_client);
+
+    add_trip = new TripAddForm(this);
 }
 
 MainWindow::~MainWindow()
@@ -64,9 +68,20 @@ void MainWindow::on_open_file_triggered()
         temp_array = json_trip[i].toArray();
         for (int j = 0; j < temp_array.count(); j++)
         {
-           temp_list.append(new QStandardItem(temp_array[j].toString()));
+             temp_list.append(new QStandardItem(temp_array[j].toString()));
         }
         model_trip->insertRow(i, temp_list);
+
+        for (int j = 0; j < temp_array.count(); j++)
+        {
+            if (j == 1 || j == 2)
+            {
+                QString strValue = temp_array[j].toString();
+                QString format = "yyyy-MM-ddTHH:mm:ss.zzz";
+                QDateTime dt = QDateTime :: fromString (strValue, format);
+                model_trip->setData(model_trip->index(i, j), dt);
+            }
+        }
     }
 
     for (int i = 0; i < json_client.count(); i++)
@@ -357,7 +372,7 @@ void MainWindow::on_btn_del_trip_clicked()
 void MainWindow::on_btn_del_client_clicked()
 {
     QModelIndex index = ui->table_client->currentIndex();
-    auto model = ui->table_trip->model();
+    auto model = ui->table_client->model();
 
     if (index.row() >= 0)
     {
@@ -379,4 +394,10 @@ void MainWindow::on_btn_del_client_clicked()
     {
         ui->status_line->showMessage("Выберите клиента!");
     }
+}
+
+void MainWindow::on_btn_add_trip_clicked()
+{
+    add_trip->setModel(model_trip);
+    add_trip->show();
 }
