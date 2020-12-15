@@ -8,6 +8,7 @@
 #include "tripeditform.h"
 #include "clienteditform.h"
 #include "tripaddform.h"
+#include "clientaddform.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,6 +23,10 @@ public:
     ~MainWindow();
 
 private slots:
+    void add_count_ticket_sale(QString trip);
+    void del_count_ticket_sale(QString trip);
+    void edit_count_ticket_sale(QString old_trip, QString new_trip);
+
     void on_open_file_triggered();
 
     void on_search_client_textChanged(const QString &arg1);
@@ -48,6 +53,10 @@ private slots:
 
     void on_btn_add_trip_clicked();
 
+    void on_btn_add_client_clicked();
+
+    void on_new_file_triggered();
+
 private:
     Ui::MainWindow *ui;
     QFileInfo file_info;
@@ -56,5 +65,6 @@ private:
     TripEditForm *edit_trip;
     ClientEditForm *edit_client;
     TripAddForm *add_trip;
+    ClientAddForm *add_client;
 };
 #endif // MAINWINDOW_H

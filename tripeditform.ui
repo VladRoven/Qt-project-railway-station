@@ -67,7 +67,14 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="count_wagons"/>
+       <widget class="QSpinBox" name="count_wagons">
+        <property name="minimum">
+         <number>7</number>
+        </property>
+        <property name="maximum">
+         <number>30</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -81,7 +88,14 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="count_stop"/>
+       <widget class="QSpinBox" name="count_stop">
+        <property name="minimum">
+         <number>4</number>
+        </property>
+        <property name="maximum">
+         <number>20</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -95,7 +109,14 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="count_tickets"/>
+       <widget class="QSpinBox" name="count_tickets">
+        <property name="minimum">
+         <number>120</number>
+        </property>
+        <property name="maximum">
+         <number>1620</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>

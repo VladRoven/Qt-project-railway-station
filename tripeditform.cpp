@@ -1,6 +1,8 @@
 #include "tripeditform.h"
 #include "ui_tripeditform.h"
 
+#include <QMessageBox>
+
 TripEditForm::TripEditForm(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::TripEditForm)
@@ -29,8 +31,28 @@ void TripEditForm::setModel(QAbstractItemModel *model)
 
 void TripEditForm::on_btn_accept_clicked()
 {
-    mapper->submit();
-    close();
+    QString error = "";
+    QRegExp trip_name_reg("([А-Я][а-я]+)-([А-Я][а-я]+)");
+    if (!trip_name_reg.exactMatch(ui->trip_name->text()))
+        error += "Корректно введите имя!\n";
+
+    if (ui->date_from->date() >= ui->date_to->date())
+        error += "Дата отправления не может быть меньше/равна даты прибытия!\n";
+
+    if (error.length())
+    {
+        QMessageBox *msg = new QMessageBox();
+        msg->setIcon(QMessageBox::Warning);
+        msg->setWindowTitle("Ошибка");
+        msg->setInformativeText(error);
+        msg->addButton("Понял", QMessageBox::AcceptRole);
+        msg->exec();
+    }
+    else
+    {
+        mapper->submit();
+        close();
+    }
 }
 
 void TripEditForm::on_btn_cancle_clicked()

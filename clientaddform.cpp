@@ -1,40 +1,35 @@
-#include "clienteditform.h"
-#include "ui_clienteditform.h"
+#include "clientaddform.h"
+#include "ui_clientaddform.h"
 
 #include <QMessageBox>
 
-ClientEditForm::ClientEditForm(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::ClientEditForm)
+ClientAddForm::ClientAddForm(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::ClientAddForm)
 {
     ui->setupUi(this);
-
     mapper = new QDataWidgetMapper(this);
     mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
 }
 
-ClientEditForm::~ClientEditForm()
+ClientAddForm::~ClientAddForm()
 {
     delete ui;
 }
 
-void ClientEditForm::setModel(QAbstractItemModel *model, QString old_trip)
+void ClientAddForm::setModel(QStandardItemModel *model)
 {
+    mapper->clearMapping();
     mapper->setModel(model);
-    mapper->addMapping(ui->client_surname, 0);
-    mapper->addMapping(ui->client_name, 1);
-    mapper->addMapping(ui->client_ticket, 2);
-    mapper->addMapping(ui->client_trip, 3);
-    this->old_trip = old_trip;
 }
 
-void ClientEditForm::setComboBox(const QStringList list)
+void ClientAddForm::setComboBox(const QStringList list)
 {
     ui->client_trip->clear();
     ui->client_trip->addItems(list);
 }
 
-void ClientEditForm::on_btn_accept_clicked()
+void ClientAddForm::on_btn_accept_clicked()
 {
     QString error = "";
     QRegExp client_name_surname_reg("([А-Я][а-я]+)");
@@ -59,13 +54,26 @@ void ClientEditForm::on_btn_accept_clicked()
     }
     else
     {
+        mapper->model()->insertRow(mapper->model()->rowCount());
+        mapper->setCurrentModelIndex(mapper->model()->index(mapper->model()->rowCount() - 1, 0));
+
+        mapper->addMapping(ui->client_surname, 0);
+        mapper->addMapping(ui->client_name, 1);
+        mapper->addMapping(ui->client_ticket, 2);
+        mapper->addMapping(ui->client_trip, 3);
+
         mapper->submit();
-        emit edit_count_ticket_sale(old_trip, ui->client_trip->currentText());
+
         close();
+        emit add_count_ticket_sale(ui->client_trip->currentText());
+
+        ui->client_surname->clear();
+        ui->client_name->clear();
+        ui->client_ticket->clear();
     }
 }
 
-void ClientEditForm::on_btn_cancle_clicked()
+void ClientAddForm::on_btn_cancle_clicked()
 {
     close();
 }

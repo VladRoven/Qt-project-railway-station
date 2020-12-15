@@ -578,7 +578,7 @@
     <property name="title">
      <string>Отчёт</string>
     </property>
-    <addaction name="action"/>
+    <addaction name="to_excel"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -600,9 +600,9 @@
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="action">
+  <action name="to_excel">
    <property name="text">
-    <string>Клиентов по рейсу</string>
+    <string>По рейсу</string>
    </property>
   </action>
   <action name="save_file_as">
