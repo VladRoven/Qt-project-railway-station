@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "xlsxdocument.h"
+#include "xlsxformat.h"
 
 #include <QFileDialog>
 #include <QJsonObject>
@@ -549,5 +551,63 @@ void MainWindow::on_new_file_triggered()
 
 void MainWindow::on_to_excel_triggered()
 {
+    if (file_info.absoluteFilePath() != "")
+    {
+        QString trip = ui->table_trip->model()->index(ui->table_trip->currentIndex().row(), 0).data().toString();
 
+        if (trip.length())
+        {
+            QString date_from = ui->table_trip->model()->index(ui->table_trip->currentIndex().row(), 1).data().toString();
+            QString date_to = ui->table_trip->model()->index(ui->table_trip->currentIndex().row(), 2).data().toString();
+            QString format = "yyyy-MM-ddTHH:mm:ss.zzz";
+            QDateTime dt_from = QDateTime :: fromString (date_from, format);
+            QDateTime dt_to = QDateTime :: fromString (date_to, format);
+
+            QXlsx::Document excel;
+            QXlsx::Format excel_format;
+            excel_format.setFontBold(true);
+            excel.setColumnWidth(1, 7, 23);
+            excel.setRowFormat(1, excel_format);
+            excel.setRowFormat(4, excel_format);
+            excel.write("A1", "Рейс");
+            excel.write("B1", "Отправление");
+            excel.write("C1", "Прибытие");
+            excel.write("E1", "Кол-во вагонов");
+            excel.write("D1", "Остановок");
+            excel.write("F1", "Билетов всего");
+            excel.write("G1", "Билетов продано");
+
+            excel.write("A2", ui->table_trip->model()->index(ui->table_trip->currentIndex().row(), 0).data().toString());
+            excel.write("B2", dt_from.toString());
+            excel.write("C2", dt_to.toString());
+            excel.write("D2", ui->table_trip->model()->index(ui->table_trip->currentIndex().row(), 3).data().toInt());
+            excel.write("E2", ui->table_trip->model()->index(ui->table_trip->currentIndex().row(), 4).data().toInt());
+            excel.write("F2", ui->table_trip->model()->index(ui->table_trip->currentIndex().row(), 5).data().toInt());
+            excel.write("G2", ui->table_trip->model()->index(ui->table_trip->currentIndex().row(), 6).data().toInt());
+
+            excel.write("A4", "Фамилия");
+            excel.write("B4", "Имя");
+            excel.write("C4", "Номер билета");
+
+            int itr = 5;
+            for (int i = 0; i < model_client->rowCount(); i++)
+            {
+                if (model_client->item(i, 3)->text().contains(trip))
+                {
+                    excel.write("A" + QString::number(itr), model_client->item(i, 0)->text());
+                    excel.write("B" + QString::number(itr), model_client->item(i, 1)->text());
+                    excel.write("C" + QString::number(itr), model_client->item(i, 2)->text());
+                    ++itr;
+                }
+            }
+
+            QString saveFileName = QFileDialog::getSaveFileName(this,
+                                                                    tr("Новый файл"),
+                                                                    QString(trip),
+                                                                    tr("Excel (*.xlsx)"));
+            excel.saveAs(saveFileName);
+        }
+        else
+            ui->status_line->showMessage("Выберите рейс!");
+    }
 }

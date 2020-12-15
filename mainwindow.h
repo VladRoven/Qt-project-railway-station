@@ -57,6 +57,8 @@ private slots:
 
     void on_new_file_triggered();
 
+    void on_to_excel_triggered();
+
 private:
     Ui::MainWindow *ui;
     QFileInfo file_info;
