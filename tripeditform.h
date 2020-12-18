@@ -16,8 +16,11 @@ public:
     explicit TripEditForm(QWidget *parent = nullptr);
     ~TripEditForm();
 
-    void setModel(QAbstractItemModel *model);
+    void setModel(QAbstractItemModel *model, QString old_trip);
     QDataWidgetMapper *mapper;
+
+signals:
+    void edit_client_trip(QString old_trip, QString new_trip);
 
 private slots:
     void on_btn_accept_clicked();
@@ -26,6 +29,7 @@ private slots:
 
 private:
     Ui::TripEditForm *ui;
+    QString old_trip;
 };
 
 #endif // TRIPEDITFORM_H

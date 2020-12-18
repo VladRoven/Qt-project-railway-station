@@ -37,7 +37,7 @@ void ClientEditForm::setComboBox(const QStringList list)
 void ClientEditForm::on_btn_accept_clicked()
 {
     QString error = "";
-    QRegExp client_name_surname_reg("([А-Я][а-я]+)");
+    QRegExp client_name_surname_reg("([А-Я][а-яё]+)");
     QRegExp client_ticket("([А-Я]){2,2}([\\d]){6,6}([А-Я]){2,2}");
     if (!client_name_surname_reg.exactMatch(ui->client_surname->text()))
         error += "Корректно введите фамилию!\n";

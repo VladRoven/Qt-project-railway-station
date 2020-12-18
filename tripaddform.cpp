@@ -21,6 +21,7 @@ void TripAddForm::setModel(QStandardItemModel *model)
 {
     mapper->clearMapping();
     mapper->setModel(model);
+    ui->count_tickets_sale->setValue(0);
 }
 
 void TripAddForm::on_btn_accept_clicked()
@@ -57,13 +58,18 @@ void TripAddForm::on_btn_accept_clicked()
 
         mapper->submit();
 
-        ui->trip_name->clear();
-        ui->date_from->clear();
-        ui->date_to->clear();
-        ui->count_wagons->setValue(0);
-        ui->count_stop->setValue(0);
-        ui->count_tickets->setValue(0);
         close();
+
+        QString strValue = "2020-01-01T00:00:00.000";
+        QString format = "yyyy-MM-ddTHH:mm:ss.zzz";
+        QDateTime dt = QDateTime :: fromString (strValue, format);
+
+        ui->trip_name->clear();
+        ui->date_from->setDateTime(dt);
+        ui->date_to->setDateTime(dt);
+        ui->count_wagons->setValue(7);
+        ui->count_stop->setValue(4);
+        ui->count_tickets->setValue(120);
     }
 }
 

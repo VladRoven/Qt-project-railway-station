@@ -18,7 +18,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 {
     ui->setupUi(this);
     edit_trip = new TripEditForm(this);
-    edit_trip->setModel(model_trip);
 
     edit_client = new ClientEditForm(this);
 
@@ -29,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     connect(add_client, &ClientAddForm::add_count_ticket_sale, this, &MainWindow::add_count_ticket_sale);
     connect(edit_client, &ClientEditForm::edit_count_ticket_sale, this, &MainWindow::edit_count_ticket_sale);
+    connect(edit_trip, &TripEditForm::edit_client_trip, this, &MainWindow::edit_client_trip);
 }
 
 MainWindow::~MainWindow()
@@ -38,9 +38,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::add_count_ticket_sale(QString trip)
 {
+    QStringList list = trip.split("|");
     for (int i = 0; i < model_trip->rowCount(); i++)
     {
-        if (model_trip->item(i, 0)->text().contains(trip))
+        if (model_trip->item(i, 0)->text().contains(list[0]) && QDateTime::fromString(model_trip->item(i, 1)->text(), "yyyy-MM-ddTHH:mm:ss.zzz").toString("dd.MM.yyyy HH:mm").contains(list[1]))
         {
             int count_ticket_sale = model_trip->item(i, 6)->text().toInt();
             QString new_count = QString::number(++count_ticket_sale);
@@ -53,9 +54,10 @@ void MainWindow::add_count_ticket_sale(QString trip)
 
 void MainWindow::del_count_ticket_sale(QString trip)
 {
+    QStringList list = trip.split("|");
     for (int i = 0; i < model_trip->rowCount(); i++)
     {
-        if (model_trip->item(i, 0)->text().contains(trip))
+        if (model_trip->item(i, 0)->text().contains(list[0]) && QDateTime::fromString(model_trip->item(i, 1)->text(), "yyyy-MM-ddTHH:mm:ss.zzz").toString("dd.MM.yyyy HH:mm").contains(list[1]))
         {
             int count_ticket_sale = model_trip->item(i, 6)->text().toInt();
             QString new_count = QString::number(--count_ticket_sale);
@@ -68,9 +70,10 @@ void MainWindow::del_count_ticket_sale(QString trip)
 
 void MainWindow::edit_count_ticket_sale(QString old_trip, QString new_trip)
 {
+    QStringList list = old_trip.split("|");
     for (int i = 0; i < model_trip->rowCount(); i++)
     {
-        if (model_trip->item(i, 0)->text().contains(old_trip))
+        if (model_trip->item(i, 0)->text().contains(list[0]) && QDateTime::fromString(model_trip->item(i, 1)->text(), "yyyy-MM-ddTHH:mm:ss.zzz").toString("dd.MM.yyyy HH:mm").contains(list[1]))
         {
             int count_ticket_sale = model_trip->item(i, 6)->text().toInt();
             QString new_count = QString::number(--count_ticket_sale);
@@ -79,9 +82,11 @@ void MainWindow::edit_count_ticket_sale(QString old_trip, QString new_trip)
         }
     }
 
+    list.clear();
+    list = new_trip.split("|");
     for (int i = 0; i < model_trip->rowCount(); i++)
     {
-        if (model_trip->item(i, 0)->text().contains(new_trip))
+        if (model_trip->item(i, 0)->text().contains(list[0]) && QDateTime::fromString(model_trip->item(i, 1)->text(), "yyyy-MM-ddTHH:mm:ss.zzz").toString("dd.MM.yyyy HH:mm").contains(list[1]))
         {
             int count_ticket_sale = model_trip->item(i, 6)->text().toInt();
             QString new_count = QString::number(++count_ticket_sale);
@@ -90,6 +95,19 @@ void MainWindow::edit_count_ticket_sale(QString old_trip, QString new_trip)
         }
     }
     ui->table_trip->setModel(model_trip);
+}
+
+void MainWindow::edit_client_trip(QString old_trip, QString new_trip)
+{
+    if (!old_trip.contains(new_trip))
+    {
+        for (int i = 0; i < model_client->rowCount(); i++)
+        {
+            if (model_client->item(i, 3)->text().contains(old_trip))
+                model_client->setItem(i, 3, new QStandardItem(new_trip));
+        }
+        ui->table_client->setModel(model_client);
+    }
 }
 
 void MainWindow::on_open_file_triggered()
@@ -221,16 +239,14 @@ void MainWindow::on_btn_set_filter_clicked()
 {
     if (file_info.absoluteFilePath() != "")
     {
-        if (ui->date_from->date() <= ui->date_to->date())
-        {
-            QSortFilterProxyModel *proxy_model = new QSortFilterProxyModel();
-            proxy_model->setSourceModel(model_trip);
-            ui->table_trip->setModel(proxy_model);
-            ui->table_trip->sortByColumn(1, Qt::AscendingOrder);
-            proxy_model->setFilterKeyColumn(1);
-            proxy_model->setFilterRegExp("([" + QString::number(ui->date_from->date().year()) + "-" + QString::number(ui->date_to->date().year()) + "])-(0[" + QString::number(ui->date_from->date().month()) + "-" + QString::number(ui->date_to->date().month()) + "]|[" + QString::number(ui->date_from->date().month()) + "-" + QString::number(ui->date_to->date().month()) + "]{1,2})-(0[" + QString::number(ui->date_from->date().day()) + "-" + QString::number(ui->date_to->date().day()) + "]|[" + QString::number(ui->date_from->date().day()) + "-" + QString::number(ui->date_to->date().day()) + "]{1,2})");
-            ui->status_line->showMessage("Найдено записей: " + QString::number(proxy_model->rowCount()));
-        }
+        QString date = QString::number(ui->filter_date->date().year()) + "-" + ((QString::number(ui->filter_date->date().month()).length() == 1) ? "0" + QString::number(ui->filter_date->date().month()) : QString::number(ui->filter_date->date().month())) + "-" + ((QString::number(ui->filter_date->date().day()).length() == 1) ? "0" + QString::number(ui->filter_date->date().day()) : QString::number(ui->filter_date->date().day()));
+        QSortFilterProxyModel *proxy_model = new QSortFilterProxyModel();
+        proxy_model->setSourceModel(ui->table_trip->model());
+        ui->table_trip->setModel(proxy_model);
+        ui->table_trip->sortByColumn(1, Qt::AscendingOrder);
+        proxy_model->setFilterKeyColumn(1);
+        proxy_model->setFilterRegExp(date);
+        ui->status_line->showMessage("Найдено записей: " + QString::number(proxy_model->rowCount()));
     }
 }
 
@@ -376,7 +392,7 @@ void MainWindow::on_table_trip_doubleClicked(const QModelIndex &index)
 {
     if (file_info.absoluteFilePath() != "")
     {
-        edit_trip->setModel(ui->table_trip->model());
+        edit_trip->setModel(ui->table_trip->model(), ui->table_trip->model()->index(index.row(), 0).data().toString() + "|" + QDateTime::fromString(ui->table_trip->model()->index(index.row(), 1).data().toString(), "yyyy-MM-ddTHH:mm:ss.zzz").toString("dd.MM.yyyy HH:mm"));
         edit_trip->mapper->setCurrentModelIndex(index);
         edit_trip->setWindowModality(Qt::ApplicationModal);
         edit_trip->show();
@@ -394,12 +410,22 @@ void MainWindow::on_table_client_doubleClicked(const QModelIndex &index)
             if (model_trip->item(i, 5)->text().toInt() <= model_trip->item(i, 6)->text().toInt())
             {
                 if (model_trip->item(i, 0)->text().contains(ui->table_client->model()->index(index.row(), 3).data().toString()))
-                    list.append(QString(model_trip->item(i)->text()));
+                {
+                    QString strValue = model_trip->item(i, 1)->text();
+                    QString format = "yyyy-MM-ddTHH:mm:ss.zzz";
+                    QDateTime dt = QDateTime :: fromString (strValue, format);
+                    list.append(model_trip->item(i)->text() + "|" + dt.toString("dd.MM.yyyy HH:mm"));
+                }
                 else
                     continue;
             }
             else
-                list.append(QString(model_trip->item(i)->text()));
+            {
+                QString strValue = model_trip->item(i, 1)->text();
+                QString format = "yyyy-MM-ddTHH:mm:ss.zzz";
+                QDateTime dt = QDateTime :: fromString (strValue, format);
+                list.append(model_trip->item(i)->text() + "|" + dt.toString("dd.MM.yyyy HH:mm"));
+            }
         }
 
         edit_client->setComboBox(list);
@@ -502,7 +528,12 @@ void MainWindow::on_btn_add_client_clicked()
             if (model_trip->item(i, 5)->text().toInt() <= model_trip->item(i, 6)->text().toInt())
                 continue;
             else
-                list.append(QString(model_trip->item(i)->text()));
+            {
+                QString strValue = model_trip->item(i, 1)->text();
+                QString format = "yyyy-MM-ddTHH:mm:ss.zzz";
+                QDateTime dt = QDateTime :: fromString (strValue, format);
+                list.append(model_trip->item(i)->text() + "|" + dt.toString("dd.MM.yyyy HH:mm"));
+            }
         }
 
         add_client->setComboBox(list);
@@ -553,7 +584,7 @@ void MainWindow::on_to_excel_triggered()
 {
     if (file_info.absoluteFilePath() != "")
     {
-        QString trip = ui->table_trip->model()->index(ui->table_trip->currentIndex().row(), 0).data().toString();
+        QString trip = ui->table_trip->model()->index(ui->table_trip->currentIndex().row(), 0).data().toString() + "|" + QDateTime::fromString(ui->table_trip->model()->index(ui->table_trip->currentIndex().row(), 1).data().toString(), "yyyy-MM-ddTHH:mm:ss.zzz").toString("dd.MM.yyyy HH:mm");
 
         if (trip.length())
         {
@@ -572,14 +603,14 @@ void MainWindow::on_to_excel_triggered()
             excel.write("A1", "Рейс");
             excel.write("B1", "Отправление");
             excel.write("C1", "Прибытие");
-            excel.write("E1", "Кол-во вагонов");
-            excel.write("D1", "Остановок");
+            excel.write("D1", "Кол-во вагонов");
+            excel.write("E1", "Остановок");
             excel.write("F1", "Билетов всего");
             excel.write("G1", "Билетов продано");
 
             excel.write("A2", ui->table_trip->model()->index(ui->table_trip->currentIndex().row(), 0).data().toString());
-            excel.write("B2", dt_from.toString());
-            excel.write("C2", dt_to.toString());
+            excel.write("B2", dt_from.toString("dd.MM.yyyy HH:mm"));
+            excel.write("C2", dt_to.toString("dd.MM.yyyy HH:mm"));
             excel.write("D2", ui->table_trip->model()->index(ui->table_trip->currentIndex().row(), 3).data().toInt());
             excel.write("E2", ui->table_trip->model()->index(ui->table_trip->currentIndex().row(), 4).data().toInt());
             excel.write("F2", ui->table_trip->model()->index(ui->table_trip->currentIndex().row(), 5).data().toInt());
@@ -603,11 +634,82 @@ void MainWindow::on_to_excel_triggered()
 
             QString saveFileName = QFileDialog::getSaveFileName(this,
                                                                     tr("Новый файл"),
-                                                                    QString(trip),
+                                                                    QString(trip.left(trip.indexOf('|'))),
                                                                     tr("Excel (*.xlsx)"));
             excel.saveAs(saveFileName);
         }
         else
             ui->status_line->showMessage("Выберите рейс!");
+    }
+}
+
+void MainWindow::on_to_excel_all_trip_triggered()
+{
+    if (file_info.absoluteFilePath() != "")
+    {
+        QXlsx::Document excel;
+        QXlsx::Format excel_format;
+        excel_format.setFontBold(true);
+        excel.setColumnWidth(1, 7, 23);
+        excel.setRowFormat(1, excel_format);
+        excel.write("A1", "Рейс");
+        excel.write("B1", "Отправление");
+        excel.write("C1", "Прибытие");
+        excel.write("D1", "Кол-во вагонов");
+        excel.write("E1", "Остановок");
+        excel.write("F1", "Билетов всего");
+        excel.write("G1", "Билетов продано");
+
+        int itr = 2;
+        for (int i = 0; i < model_trip->rowCount(); i++)
+        {
+            excel.write("A" + QString::number(itr), model_trip->item(i, 0)->text());
+            excel.write("B" + QString::number(itr), QDateTime::fromString(model_trip->item(i, 1)->text(), "yyyy-MM-ddTHH:mm:ss.zzz").toString("dd.MM.yyyy HH:mm"));
+            excel.write("C" + QString::number(itr), QDateTime::fromString(model_trip->item(i, 2)->text(), "yyyy-MM-ddTHH:mm:ss.zzz").toString("dd.MM.yyyy HH:mm"));
+            excel.write("D" + QString::number(itr), model_trip->item(i, 3)->text().toInt());
+            excel.write("E" + QString::number(itr), model_trip->item(i, 4)->text().toInt());
+            excel.write("F" + QString::number(itr), model_trip->item(i, 5)->text().toInt());
+            excel.write("G" + QString::number(itr), model_trip->item(i, 6)->text().toInt());
+            ++itr;
+        }
+
+        QString saveFileName = QFileDialog::getSaveFileName(this,
+                                                                tr("Новый файл"),
+                                                                QString("Все рейсы"),
+                                                                tr("Excel (*.xlsx)"));
+        excel.saveAs(saveFileName);
+    }
+}
+
+void MainWindow::on_to_excel_all_client_triggered()
+{
+    if (file_info.absoluteFilePath() != "")
+    {
+        QXlsx::Document excel;
+        QXlsx::Format excel_format;
+        excel_format.setFontBold(true);
+        excel.setColumnWidth(1, 4, 23);
+        excel.setColumnWidth(4, 33);
+        excel.setRowFormat(1, excel_format);
+        excel.write("A1", "Фамилия");
+        excel.write("B1", "Имя");
+        excel.write("C1", "Номер билета");
+        excel.write("D1", "Рейс");
+
+        int itr = 2;
+        for (int i = 0; i < model_client->rowCount(); i++)
+        {
+            excel.write("A" + QString::number(itr), model_client->item(i, 0)->text());
+            excel.write("B" + QString::number(itr), model_client->item(i, 1)->text());
+            excel.write("C" + QString::number(itr), model_client->item(i, 2)->text());
+            excel.write("D" + QString::number(itr), model_client->item(i, 3)->text());
+            ++itr;
+        }
+
+        QString saveFileName = QFileDialog::getSaveFileName(this,
+                                                                tr("Новый файл"),
+                                                                QString("Все клиенты"),
+                                                                tr("Excel (*.xlsx)"));
+        excel.saveAs(saveFileName);
     }
 }

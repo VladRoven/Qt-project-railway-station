@@ -18,7 +18,7 @@ TripEditForm::~TripEditForm()
     delete ui;
 }
 
-void TripEditForm::setModel(QAbstractItemModel *model)
+void TripEditForm::setModel(QAbstractItemModel *model, QString old_trip)
 {
     mapper->setModel(model);
     mapper->addMapping(ui->trip_name, 0);
@@ -27,6 +27,7 @@ void TripEditForm::setModel(QAbstractItemModel *model)
     mapper->addMapping(ui->count_wagons, 3);
     mapper->addMapping(ui->count_stop, 4);
     mapper->addMapping(ui->count_tickets, 5);
+    this->old_trip = old_trip;
 }
 
 void TripEditForm::on_btn_accept_clicked()
@@ -50,6 +51,7 @@ void TripEditForm::on_btn_accept_clicked()
     }
     else
     {
+        emit edit_client_trip(old_trip, ui->trip_name->text() + "|" + ui->date_from->text());
         mapper->submit();
         close();
     }

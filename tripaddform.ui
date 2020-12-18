@@ -50,6 +50,16 @@
           <day>1</day>
          </datetime>
         </property>
+        <property name="minimumDateTime">
+         <datetime>
+          <hour>0</hour>
+          <minute>0</minute>
+          <second>0</second>
+          <year>2020</year>
+          <month>1</month>
+          <day>1</day>
+         </datetime>
+        </property>
        </widget>
       </item>
      </layout>
@@ -66,6 +76,16 @@
       <item>
        <widget class="QDateTimeEdit" name="date_to">
         <property name="dateTime">
+         <datetime>
+          <hour>0</hour>
+          <minute>0</minute>
+          <second>0</second>
+          <year>2020</year>
+          <month>1</month>
+          <day>1</day>
+         </datetime>
+        </property>
+        <property name="minimumDateTime">
          <datetime>
           <hour>0</hour>
           <minute>0</minute>

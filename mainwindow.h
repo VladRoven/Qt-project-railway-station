@@ -26,6 +26,7 @@ private slots:
     void add_count_ticket_sale(QString trip);
     void del_count_ticket_sale(QString trip);
     void edit_count_ticket_sale(QString old_trip, QString new_trip);
+    void edit_client_trip(QString old_trip, QString new_trip);
 
     void on_open_file_triggered();
 
@@ -58,6 +59,10 @@ private slots:
     void on_new_file_triggered();
 
     void on_to_excel_triggered();
+
+    void on_to_excel_all_trip_triggered();
+
+    void on_to_excel_all_client_triggered();
 
 private:
     Ui::MainWindow *ui;
