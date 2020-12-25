@@ -25,7 +25,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="trip_name"/>
+       <widget class="QLineEdit" name="trip_name">
+        <property name="placeholderText">
+         <string>Откуда-Куда</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>

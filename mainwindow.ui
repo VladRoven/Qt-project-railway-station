@@ -66,7 +66,11 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="search_trip"/>
+               <widget class="QLineEdit" name="search_trip">
+                <property name="placeholderText">
+                 <string/>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
@@ -212,7 +216,7 @@
            <bool>false</bool>
           </attribute>
           <attribute name="verticalHeaderVisible">
-           <bool>true</bool>
+           <bool>false</bool>
           </attribute>
          </widget>
         </item>

@@ -25,7 +25,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="client_surname"/>
+       <widget class="QLineEdit" name="client_surname">
+        <property name="placeholderText">
+         <string>Фамилия</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -39,7 +43,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="client_name"/>
+       <widget class="QLineEdit" name="client_name">
+        <property name="placeholderText">
+         <string>Имя</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -53,7 +61,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="client_ticket"/>
+       <widget class="QLineEdit" name="client_ticket">
+        <property name="placeholderText">
+         <string>АА111111АА (пример)</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
